@@ -62,6 +62,7 @@ public final class Stty {
                 File sttyFile = new File(p, "stty.exe");
                 if (sttyFile.canExecute()) {
                     stty = sttyFile.getAbsolutePath();
+                    break;
                 }
             }
         }
