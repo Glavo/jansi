@@ -81,7 +81,17 @@ public final class Stty {
         } catch (Throwable t) {
             if ("java.lang.reflect.InaccessibleObjectException"
                     .equals(t.getClass().getName())) {
-                System.err.println("MINGW support requires --add-opens java.base/java.lang=ALL-UNNAMED");
+                String moduleName = null;
+                try {
+                    Object module = Class.class.getMethod("getModule").invoke(Stty.class);
+                    moduleName = (String) Class.forName("java.lang.Module")
+                            .getMethod("getName")
+                            .invoke(module);
+                } catch (Throwable ignored) {
+                }
+
+                System.err.println("WARNING: MinGW support requires --add-opens=java.base/java.lang="
+                        + (moduleName == null ? "ALL-UNNAMED" : moduleName));
             }
             // ignore
         }
