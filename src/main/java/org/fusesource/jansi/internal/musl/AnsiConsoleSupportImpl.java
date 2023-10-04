@@ -15,18 +15,9 @@
  */
 package org.fusesource.jansi.internal.musl;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
-
 import org.fusesource.jansi.internal.AnsiConsoleSupport;
+import org.fusesource.jansi.internal.Stty;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
-
-import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
 
@@ -37,69 +28,24 @@ public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
     @Override
     protected CLibrary createCLibrary() {
         return new CLibrary() {
-            private final String[] command;
             private final String stdoutTty =
-                    CTypeConversion.toJavaString(PosixCLibrary.ttyname(CLibrary.STDOUT_FILENO));
+                    CTypeConversion.toJavaString(PosixCLibrary.ttyname(STDOUT_FILENO));
             private final String stderrTty =
-                    CTypeConversion.toJavaString(PosixCLibrary.ttyname(CLibrary.STDERR_FILENO));
-
-            {
-                String stty = "stty";
-
-                String path = System.getenv("PATH");
-                if (path != null) {
-                    for (String p : path.split(File.pathSeparator)) {
-                        Path sttyFile = Paths.get(p, "stty");
-                        if (Files.isExecutable(sttyFile)) {
-                            stty = sttyFile.toAbsolutePath().normalize().toString();
-                        }
-                    }
-                }
-
-                command = new String[] {stty, "size"};
-            }
+                    CTypeConversion.toJavaString(PosixCLibrary.ttyname(STDERR_FILENO));
 
             @Override
             public short getTerminalWidth(int fd) {
-                if (isTty(fd) == 0) {
+                String ttyName;
+                if (fd == STDOUT_FILENO) {
+                    ttyName = stdoutTty;
+                } else if (fd == STDERR_FILENO) {
+                    ttyName = stderrTty;
+                } else {
                     return 0;
                 }
 
-                Process process = null;
-                try {
-                    process = new ProcessBuilder(command)
-                            .redirectInput(ProcessBuilder.Redirect.INHERIT)
-                            .start();
-
-                    if (process.waitFor(10, TimeUnit.SECONDS) && process.exitValue() == 0) {
-                        try (InputStream inputStream = process.getInputStream()) {
-                            // If the result is longer than that, then it's most likely not in the format we expected
-                            int MAX_RESULT_LENGTH = 12;
-                            byte[] buffer = new byte[MAX_RESULT_LENGTH + 1];
-                            int totalRead = 0;
-                            int read;
-                            while ((read = inputStream.read(buffer, totalRead, buffer.length - totalRead)) > 0) {
-                                totalRead += read;
-                            }
-
-                            if (totalRead <= MAX_RESULT_LENGTH) {
-                                String str = new String(buffer, 0, totalRead, US_ASCII).trim();
-
-                                int idx = str.indexOf(' ');
-                                if (idx > 0) {
-                                    return Short.parseShort(str.substring(idx + 1));
-                                }
-                            }
-                        }
-                    }
-                } catch (IOException | InterruptedException | NumberFormatException ignored) {
-                } finally {
-                    if (process != null) {
-                        process.destroy();
-                    }
-                }
-
-                return 0;
+                int width = Stty.getTerminalWidth(ttyName);
+                return width >= 0 && width <= Short.MAX_VALUE ? (short) width : 0;
             }
 
             @Override

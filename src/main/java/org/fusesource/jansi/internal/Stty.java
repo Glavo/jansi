@@ -26,49 +26,52 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Support for MINGW terminals.
- * Those terminals do not use the underlying windows terminal and there's no CLibrary available
- * in these environments.  We have to rely on calling {@code stty.exe} and {@code tty.exe} to
+ * Support for POSIX-compliant or MinGW terminals.
+ * <p>
+ * MinGW terminals do not use the underlying Windows terminal, and there's no CLibrary available
+ * in the environments. We have to rely on calling {@code stty} and {@code tty} to
  * obtain the terminal name and width.
  */
-public class MingwSupport {
+public final class Stty {
 
-    private final String sttyCommand;
-    private final String ttyCommand;
-    private final Pattern columnsPatterns;
+    private static final String TTY_COMMAND;
+    private static final String STTY_COMMAND;
+    private static final String STTY_F_COMMAND;
+    private static final Pattern COLUMNS_PATTERN = Pattern.compile("\\d+ (\\d+)");
 
-    public MingwSupport() {
-        String tty = null;
-        String stty = null;
+    static {
+        boolean isWindows = OSInfo.isWindows();
+
+        String tty = isWindows ? "tty.exe" : "tty";
+        String stty = isWindows ? "stty.exe" : "stty";
         String path = System.getenv("PATH");
         if (path != null) {
             String[] paths = path.split(File.pathSeparator);
+
             for (String p : paths) {
                 File ttyFile = new File(p, "tty.exe");
-                if (tty == null && ttyFile.canExecute()) {
+                if (ttyFile.canExecute()) {
                     tty = ttyFile.getAbsolutePath();
+                    break;
                 }
+            }
+
+            for (String p : paths) {
                 File sttyFile = new File(p, "stty.exe");
-                if (stty == null && sttyFile.canExecute()) {
+                if (sttyFile.canExecute()) {
                     stty = sttyFile.getAbsolutePath();
                 }
             }
         }
-        if (tty == null) {
-            tty = "tty.exe";
-        }
-        if (stty == null) {
-            stty = "stty.exe";
-        }
-        ttyCommand = tty;
-        sttyCommand = stty;
-        // Compute patterns
-        columnsPatterns = Pattern.compile("\\b" + "columns" + "\\s+(\\d+)\\b");
+
+        TTY_COMMAND = tty;
+        STTY_COMMAND = stty;
+        STTY_F_COMMAND = OSInfo.isMacOS() ? "-f" : "-F";
     }
 
-    public String getConsoleName(boolean stdout) {
+    public static String getConsoleName(boolean stdout) {
         try {
-            Process p = new ProcessBuilder(ttyCommand)
+            Process p = new ProcessBuilder(TTY_COMMAND)
                     .redirectInput(getRedirect(stdout ? FileDescriptor.out : FileDescriptor.err))
                     .start();
             String result = waitAndCapture(p);
@@ -85,15 +88,15 @@ public class MingwSupport {
         return null;
     }
 
-    public int getTerminalWidth(String name) {
+    public static int getTerminalWidth(String name) {
         try {
-            Process p = new ProcessBuilder(sttyCommand, "-F", name, "-a").start();
+            Process p = new ProcessBuilder(STTY_COMMAND, STTY_F_COMMAND, name, "size").start();
             String result = waitAndCapture(p);
             if (p.exitValue() != 0) {
-                throw new IOException("Error executing '" + sttyCommand + "': " + result);
+                throw new IOException("Error executing '" + STTY_COMMAND + "': " + result);
             }
-            Matcher matcher = columnsPatterns.matcher(result);
-            if (matcher.find()) {
+            Matcher matcher = COLUMNS_PATTERN.matcher(result);
+            if (matcher.matches()) {
                 return Integer.parseInt(matcher.group(1));
             }
             throw new IOException("Unable to parse columns");
@@ -115,7 +118,7 @@ public class MingwSupport {
             }
             p.waitFor();
         }
-        return bout.toString();
+        return bout.toString("UTF-8");
     }
 
     /**
@@ -133,5 +136,8 @@ public class MingwSupport {
         f.setAccessible(true);
         f.set(input, fd);
         return input;
+    }
+
+    private Stty() {
     }
 }

@@ -25,7 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 
-import org.fusesource.jansi.internal.MingwSupport;
+import org.fusesource.jansi.internal.Stty;
 import org.fusesource.jansi.internal.OSInfo;
 import org.fusesource.jansi.io.AnsiOutputStream;
 import org.fusesource.jansi.io.AnsiProcessor;
@@ -306,10 +306,9 @@ public class AnsiConsole {
                 processor = null;
                 type = AnsiType.Native;
                 installer = uninstaller = null;
-                MingwSupport mingw = new MingwSupport();
-                String name = mingw.getConsoleName(stdout);
+                String name = Stty.getConsoleName(stdout);
                 if (name != null && !name.isEmpty()) {
-                    width = () -> mingw.getTerminalWidth(name);
+                    width = () -> Stty.getTerminalWidth(name);
                 } else {
                     width = () -> -1;
                 }
