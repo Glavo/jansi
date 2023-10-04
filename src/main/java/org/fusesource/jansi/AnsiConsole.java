@@ -174,6 +174,11 @@ public class AnsiConsole {
      */
     public static final String JANSI_PROVIDER_FFM = "ffm";
     /**
+     * The name of the {@code stty} provider.
+     */
+    public static final String JANSI_PROVIDER_STTY = "stty";
+
+    /**
      * The name of the {@code native-image} provider.
      * <p>This provider uses the
      * <a href="https://www.graalvm.org/latest/reference-manual/native-image/native-code-interoperability/C-API/">Native Image C API</a>

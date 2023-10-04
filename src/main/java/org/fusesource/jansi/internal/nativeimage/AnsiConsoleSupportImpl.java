@@ -18,7 +18,7 @@ package org.fusesource.jansi.internal.nativeimage;
 import org.fusesource.jansi.AnsiConsole;
 import org.fusesource.jansi.internal.AnsiConsoleSupport;
 import org.fusesource.jansi.internal.OSInfo;
-import org.fusesource.jansi.internal.stty.Stty;
+import org.fusesource.jansi.internal.stty.SttyCLibrary;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
 
 public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
@@ -37,27 +37,10 @@ public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
 
     @Override
     protected CLibrary createCLibrary() {
-        return new CLibrary() {
-            private final String stdoutTty = CTypeConversion.toJavaString(PosixCLibrary.ttyname(STDOUT_FILENO));
-            private final String stderrTty = CTypeConversion.toJavaString(PosixCLibrary.ttyname(STDERR_FILENO));
+        String stdoutTty = CTypeConversion.toJavaString(PosixCLibrary.ttyname(CLibrary.STDOUT_FILENO));
+        String stderrTty = CTypeConversion.toJavaString(PosixCLibrary.ttyname(CLibrary.STDERR_FILENO));
 
-            @Override
-            public short getTerminalWidth(int fd) {
-                String ttyName = null;
-                if (fd == STDOUT_FILENO) {
-                    ttyName = stdoutTty;
-                } else if (fd == STDERR_FILENO) {
-                    ttyName = stderrTty;
-                }
-
-                if (ttyName == null || ttyName.isEmpty()) {
-                    return 0;
-                }
-
-                int width = Stty.getTerminalWidth(ttyName);
-                return width >= 0 && width <= Short.MAX_VALUE ? (short) width : 0;
-            }
-
+        return new SttyCLibrary(stdoutTty, stderrTty) {
             @Override
             public int isTty(int fd) {
                 return PosixCLibrary.isatty(fd);

@@ -15,41 +15,17 @@
  */
 package org.fusesource.jansi.internal.stty;
 
+import org.fusesource.jansi.AnsiConsole;
 import org.fusesource.jansi.internal.AnsiConsoleSupport;
 
 public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
     public AnsiConsoleSupportImpl() {
-        super("stty");
+        super(AnsiConsole.JANSI_PROVIDER_STTY);
     }
 
     @Override
     protected CLibrary createCLibrary() {
-        return new CLibrary() {
-            private final String stdoutTty = Stty.getConsoleName(true);
-            private final String stderrTty = Stty.getConsoleName(false);
-
-            @Override
-            public short getTerminalWidth(int fd) {
-                String ttyName = null;
-                if (fd == STDOUT_FILENO) {
-                    ttyName = stdoutTty;
-                } else if (fd == STDERR_FILENO) {
-                    ttyName = stderrTty;
-                }
-
-                if (ttyName == null || ttyName.isEmpty()) {
-                    return 0;
-                }
-
-                int width = Stty.getTerminalWidth(ttyName);
-                return width >= 0 && width <= Short.MAX_VALUE ? (short) width : 0;
-            }
-
-            @Override
-            public int isTty(int fd) {
-                return (fd == STDOUT_FILENO && stdoutTty != null) || (fd == STDERR_FILENO && stderrTty != null) ? 1 : 0;
-            }
-        };
+        return new SttyCLibrary(Stty.getConsoleName(true), Stty.getConsoleName(false));
     }
 
     @Override
