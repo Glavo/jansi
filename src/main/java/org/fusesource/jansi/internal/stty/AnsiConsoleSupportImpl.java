@@ -18,7 +18,7 @@ package org.fusesource.jansi.internal.stty;
 import org.fusesource.jansi.internal.AnsiConsoleSupport;
 
 public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
-    public AnsiConsoleSupportImpl(String providerName) {
+    public AnsiConsoleSupportImpl() {
         super("stty");
     }
 
