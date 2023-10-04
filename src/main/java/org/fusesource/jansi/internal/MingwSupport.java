@@ -121,7 +121,7 @@ public class MingwSupport {
     /**
      * This requires --add-opens java.base/java.lang=ALL-UNNAMED
      */
-    private ProcessBuilder.Redirect getRedirect(FileDescriptor fd) throws ReflectiveOperationException {
+    private static ProcessBuilder.Redirect getRedirect(FileDescriptor fd) throws ReflectiveOperationException {
         // This is not really allowed, but this is the only way to redirect the output or error stream
         // to the input.  This is definitely not something you'd usually want to do, but in the case of
         // the `tty` utility, it provides a way to get
