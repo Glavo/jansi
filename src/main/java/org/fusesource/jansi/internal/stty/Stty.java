@@ -51,7 +51,7 @@ public final class Stty {
             String[] paths = path.split(File.pathSeparator);
 
             for (String p : paths) {
-                File ttyFile = new File(p, "tty.exe");
+                File ttyFile = new File(p, tty);
                 if (ttyFile.canExecute()) {
                     tty = ttyFile.getAbsolutePath();
                     break;
@@ -59,7 +59,7 @@ public final class Stty {
             }
 
             for (String p : paths) {
-                File sttyFile = new File(p, "stty.exe");
+                File sttyFile = new File(p, stty);
                 if (sttyFile.canExecute()) {
                     stty = sttyFile.getAbsolutePath();
                     break;
