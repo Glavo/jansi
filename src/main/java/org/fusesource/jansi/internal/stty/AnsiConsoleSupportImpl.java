@@ -24,17 +24,30 @@ public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
 
     @Override
     protected CLibrary createCLibrary() {
-
         return new CLibrary() {
+            private final String stdoutTty = Stty.getConsoleName(true);
+            private final String stderrTty = Stty.getConsoleName(false);
 
             @Override
             public short getTerminalWidth(int fd) {
-                return 0;
+                String ttyName = null;
+                if (fd == STDOUT_FILENO) {
+                    ttyName = stdoutTty;
+                } else if (fd == STDERR_FILENO) {
+                    ttyName = stderrTty;
+                }
+
+                if (ttyName == null || ttyName.isEmpty()) {
+                    return 0;
+                }
+
+                int width = Stty.getTerminalWidth(ttyName);
+                return width >= 0 && width <= Short.MAX_VALUE ? (short) width : 0;
             }
 
             @Override
             public int isTty(int fd) {
-                return 0;
+                return fd == STDOUT_FILENO && stdoutTty != null || fd == STDERR_FILENO && stderrTty != null ? 1 : 0;
             }
         };
     }
