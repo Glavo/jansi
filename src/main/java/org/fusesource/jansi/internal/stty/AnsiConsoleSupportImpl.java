@@ -47,7 +47,7 @@ public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
 
             @Override
             public int isTty(int fd) {
-                return fd == STDOUT_FILENO && stdoutTty != null || fd == STDERR_FILENO && stderrTty != null ? 1 : 0;
+                return (fd == STDOUT_FILENO && stdoutTty != null) || (fd == STDERR_FILENO && stderrTty != null) ? 1 : 0;
             }
         };
     }
