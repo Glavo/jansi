@@ -15,8 +15,6 @@
  */
 package org.fusesource.jansi.internal.stty;
 
-import org.fusesource.jansi.internal.OSInfo;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
@@ -26,6 +24,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.fusesource.jansi.internal.OSInfo;
 
 /**
  * Support for POSIX-compliant or MinGW terminals.

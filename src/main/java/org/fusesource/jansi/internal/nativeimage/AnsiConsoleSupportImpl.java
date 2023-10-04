@@ -43,12 +43,14 @@ public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
 
             @Override
             public short getTerminalWidth(int fd) {
-                String ttyName;
+                String ttyName = null;
                 if (fd == STDOUT_FILENO) {
                     ttyName = stdoutTty;
                 } else if (fd == STDERR_FILENO) {
                     ttyName = stderrTty;
-                } else {
+                }
+
+                if (ttyName == null || ttyName.isEmpty()) {
                     return 0;
                 }
 
