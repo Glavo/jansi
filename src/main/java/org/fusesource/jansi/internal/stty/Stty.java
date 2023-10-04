@@ -93,7 +93,9 @@ public final class Stty {
                     String targetName = target.toString();
                     if (targetName.startsWith("/dev/tty") || targetName.startsWith("/dev/pts/")) {
                         return targetName;
-                    } else if (targetName.startsWith("pipe:") || Files.isRegularFile(target)) {
+                    } else if (targetName.startsWith("pipe:")
+                            || targetName.equals("/dev/null")
+                            || Files.isRegularFile(target)) {
                         return null;
                     }
                 } catch (Throwable ignored) {
