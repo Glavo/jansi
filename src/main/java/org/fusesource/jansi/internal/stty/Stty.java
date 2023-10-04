@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,6 +85,21 @@ public final class Stty {
                 return result.trim();
             }
         } catch (Throwable t) {
+            if (!OSInfo.isWindows() && !OSInfo.isMacOS()) {
+                Path fd = Paths.get("/proc/self/fd/" + (stdout ? "1" : "2"));
+
+                try {
+                    Path target = Files.readSymbolicLink(fd);
+                    String targetName = target.toString();
+                    if (targetName.startsWith("/dev/tty") || targetName.startsWith("/dev/")) {
+                        return targetName;
+                    } else if (targetName.startsWith("pipe:") || Files.isRegularFile(target)) {
+                        return null;
+                    }
+                } catch (Throwable ignored) {
+                }
+            }
+
             if ("java.lang.reflect.InaccessibleObjectException"
                     .equals(t.getClass().getName())) {
                 String moduleName = null;
