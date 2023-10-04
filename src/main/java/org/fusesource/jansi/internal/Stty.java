@@ -95,7 +95,7 @@ public final class Stty {
             if (p.exitValue() != 0) {
                 throw new IOException("Error executing '" + STTY_COMMAND + "': " + result);
             }
-            Matcher matcher = COLUMNS_PATTERN.matcher(result);
+            Matcher matcher = COLUMNS_PATTERN.matcher(result.trim());
             if (matcher.matches()) {
                 return Integer.parseInt(matcher.group(1));
             }
@@ -138,6 +138,5 @@ public final class Stty {
         return input;
     }
 
-    private Stty() {
-    }
+    private Stty() {}
 }

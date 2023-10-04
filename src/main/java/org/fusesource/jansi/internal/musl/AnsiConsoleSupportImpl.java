@@ -28,10 +28,8 @@ public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
     @Override
     protected CLibrary createCLibrary() {
         return new CLibrary() {
-            private final String stdoutTty =
-                    CTypeConversion.toJavaString(PosixCLibrary.ttyname(STDOUT_FILENO));
-            private final String stderrTty =
-                    CTypeConversion.toJavaString(PosixCLibrary.ttyname(STDERR_FILENO));
+            private final String stdoutTty = CTypeConversion.toJavaString(PosixCLibrary.ttyname(STDOUT_FILENO));
+            private final String stderrTty = CTypeConversion.toJavaString(PosixCLibrary.ttyname(STDERR_FILENO));
 
             @Override
             public short getTerminalWidth(int fd) {
