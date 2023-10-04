@@ -18,7 +18,7 @@ package org.fusesource.jansi.internal.nativeimage;
 import org.fusesource.jansi.AnsiConsole;
 import org.fusesource.jansi.internal.AnsiConsoleSupport;
 import org.fusesource.jansi.internal.OSInfo;
-import org.fusesource.jansi.internal.Stty;
+import org.fusesource.jansi.internal.stty.Stty;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
 
 public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {

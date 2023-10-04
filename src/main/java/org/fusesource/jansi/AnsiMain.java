@@ -29,7 +29,7 @@ import org.fusesource.jansi.Ansi.Attribute;
 import org.fusesource.jansi.internal.AnsiConsoleSupport;
 import org.fusesource.jansi.internal.AnsiConsoleSupportHolder;
 import org.fusesource.jansi.internal.JansiLoader;
-import org.fusesource.jansi.internal.Stty;
+import org.fusesource.jansi.internal.stty.Stty;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.fusesource.jansi.Ansi.ansi;

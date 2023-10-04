@@ -26,7 +26,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 
 import org.fusesource.jansi.internal.OSInfo;
-import org.fusesource.jansi.internal.Stty;
+import org.fusesource.jansi.internal.stty.Stty;
 import org.fusesource.jansi.io.AnsiOutputStream;
 import org.fusesource.jansi.io.AnsiProcessor;
 import org.fusesource.jansi.io.FastBufferedOutputStream;
