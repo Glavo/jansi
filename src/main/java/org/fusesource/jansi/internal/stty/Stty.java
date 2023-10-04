@@ -91,7 +91,7 @@ public final class Stty {
                 try {
                     Path target = Files.readSymbolicLink(fd);
                     String targetName = target.toString();
-                    if (targetName.startsWith("/dev/tty") || targetName.startsWith("/dev/")) {
+                    if (targetName.startsWith("/dev/tty") || targetName.startsWith("/dev/pts/")) {
                         return targetName;
                     } else if (targetName.startsWith("pipe:") || Files.isRegularFile(target)) {
                         return null;
