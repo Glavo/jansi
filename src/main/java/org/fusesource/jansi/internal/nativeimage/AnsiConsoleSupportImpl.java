@@ -13,16 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.fusesource.jansi.internal.musl;
+package org.fusesource.jansi.internal.nativeimage;
 
+import org.fusesource.jansi.AnsiConsole;
 import org.fusesource.jansi.internal.AnsiConsoleSupport;
+import org.fusesource.jansi.internal.OSInfo;
 import org.fusesource.jansi.internal.Stty;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
 
 public final class AnsiConsoleSupportImpl extends AnsiConsoleSupport {
 
     public AnsiConsoleSupportImpl() {
-        super("musl");
+        super(AnsiConsole.JANSI_PROVIDER_NATIVE_IMAGE);
+
+        if (!OSInfo.isInImageCode()) {
+            throw new UnsupportedOperationException("This provider is only available in native images");
+        }
+
+        if (OSInfo.isWindows()) {
+            throw new UnsupportedOperationException("This provider is currently unavailable on Windows");
+        }
     }
 
     @Override

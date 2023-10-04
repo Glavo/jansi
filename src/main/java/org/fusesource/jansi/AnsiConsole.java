@@ -173,6 +173,17 @@ public class AnsiConsole {
      * The name of the {@code ffm} provider.
      */
     public static final String JANSI_PROVIDER_FFM = "ffm";
+    /**
+     * The name of the {@code native-image} provider.
+     * <p>This provider uses the
+     * <a href="https://www.graalvm.org/latest/reference-manual/native-image/native-code-interoperability/C-API/">Native Image C API</a>
+     * to call native functions, so it is only available when building to native image.
+     * Additionally, this provider currently does not support Windows.
+     * <p>Note: This is not the only provider available on Native Image,
+     * and it is usually recommended to use ffm or jni provider.
+     * This provider is mainly used when building static native images linked to musl libc.
+     */
+    public static final String JANSI_PROVIDER_NATIVE_IMAGE = "native-image";
 
     /**
      * @deprecated this field will be made private in a future release, use {@link #sysOut()} instead
