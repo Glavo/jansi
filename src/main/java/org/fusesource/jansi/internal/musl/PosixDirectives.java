@@ -21,6 +21,6 @@ import org.graalvm.nativeimage.c.CContext;
 public class PosixDirectives implements CContext.Directives {
     @Override
     public boolean isInConfiguration() {
-        return !Platform.includedIn(Platform.WINDOWS.class);
+        return Platform.includedIn(Platform.LINUX.class) || Platform.includedIn(Platform.MACOS.class);
     }
 }
